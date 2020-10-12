@@ -1,0 +1,144 @@
+{% extends 'shop/basic.html'  %}
+
+{% block title %} 2D Rendering {% endblock %}
+
+{% block css %}
+
+.image-preview{
+width: 100%;
+height: 800px;
+border: 2px solid black;
+
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: bold;
+color: #cccccc;
+}
+
+.image-preview__image{
+    position: absolute;
+display: none;
+width: 110%;
+height: 450px;
+}
+
+#imgprod{
+z-index: 1;
+width: 110px;
+height: 110px;
+}
+
+.div1{
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.ab{
+    max-height: 900px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+{% endblock %}
+
+
+
+
+{% block body %}
+{% load static %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Products</h5>
+                    <p class="card-text">Drag and drop these products.</p>
+                    <div class="ab">
+                        {% for i in product %}
+                        <img src='/media/{{i.image}}' id="imgprod" class="makeMeDraggable mr-2 mb-2">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="image-preview" id="imagePreview">
+                        <img src="" alt="" class="image-preview__image">
+                        <span class="image-preview__default-text">Background Preview</span>
+                    <div id="makeMeDroppable"> </div>
+                </div><br>
+            <input type="file" name="inpFile" id="inpFile">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+        {% block js %}
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+        <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
+        <script>
+            $(init);
+            function init() {
+                $('.makeMeDraggable').draggable();
+                $('#makeMeDroppable').droppable({
+                    drop: handleDropEvent
+                });
+            }
+            function handleDropEvent(event, ui) {
+                var draggable = ui.draggable;
+                // alert('The square with ID "' + draggable.attr('id') + '" was dropped onto me!');
+            }
+            const inpFile = document.getElementById("inpFile");
+            const previewContainer = document.getElementById("imagePreview");
+            const previewImage = previewContainer.querySelector(".image-preview__image");
+            const previewDefaultText = previewContainer.querySelector(".image-preview__default-text");
+
+            inpFile.addEventListener("change", function () {
+                const file = this.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    previewDefaultText.style.display = "none";
+                    previewImage.style.display = "block";
+
+                    reader.addEventListener("load", function () {
+                        previewImage.setAttribute("src", this.result);
+                    });
+
+                    reader.readAsDataURL(file);
+                } else {
+                    previewDefaultText.style.display = null;
+                    previewImage.style.display = null;
+                }
+            });
+
+            var f = function() {
+
+                    function eventHandler(event) {
+                        var width = parseInt(window.getComputedStyle(this).width);
+                        var height = parseInt(window.getComputedStyle(this).height);
+                        var zoom = 40;
+
+                        if (event.wheelDelta > 0) {
+                            this.style.width = Math.min(1000, width + zoom) + "px";
+                            this.style.height = Math.min(1000, height + zoom) + "px";
+                        }
+                        else {
+                            this.style.width = Math.max(110, width - zoom) + "px";
+                            this.style.height = Math.max(110, height - zoom) + "px";
+                        }
+                        event.preventDefault();
+                    }
+                    var imageElement = document.getElementById('imgprod');
+                    imageElement.addEventListener('mousewheel', eventHandler, false);        
+                };
+                window.addEventListener('load', f, false);
+        </script>
+        {% endblock %}  
